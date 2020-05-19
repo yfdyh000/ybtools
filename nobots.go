@@ -27,8 +27,16 @@ import (
 var botName string
 
 var botBanRegex *regexp.Regexp
+var botWhitelistRegex *regexp.Regexp
+var botAllowThisBotRegex *regexp.Regexp
 
-const botBanRegexTemplate string = `{{nobots}}|{{bots\|deny=(?:[^,|}]*,)*%[1]s|{{bots\|allow=(?![^}|]*%[1]s[},|])`
+const botBanRegexTemplate string = `{{nobots}}|{{bots\|deny=(?:[^,|}]*,)*%[1]s`
+const botWhitelistRegexTemplate string = `{{bots\|allow=`
+const botAllowRegexTemplate string = `{{bots\|allow=(?![^}|]*%[1]s[},|])`
+
+func init() {
+	botWhitelistRegex = regexp.MustCompile(botWhitelistRegexTemplate)
+}
 
 // BotAllowed take a page content and determines if the botName given is allowed
 // to edit the page per the applicable templates.
@@ -36,6 +44,16 @@ func BotAllowed(pageContent string) bool {
 	if botName == "" {
 		panic("BotAllowed called with no botName set!")
 	}
+
+	// this mess below is only necessary because Go doesn't support regex lookaheads
+	// which I know is because there are problems in terms of time guarantees for them
+	// but ugh.
+	if botWhitelistRegex.MatchString(pageContent) {
+		// the page contains a whitelist, we need to check if we're on it
+		return botAllowThisBotRegex.MatchString(pageContent)
+	}
+
+	// the page doesn't contain a whitelist, return true if we're not blacklisted or nobotted
 	return !botBanRegex.MatchString(pageContent)
 }
 
@@ -43,4 +61,5 @@ func BotAllowed(pageContent string) bool {
 func SetupBot(bn string) {
 	botName = bn
 	botBanRegex = regexp.MustCompile(fmt.Sprintf(botBanRegexTemplate, bn))
+	botAllowThisBotRegex = regexp.MustCompile(fmt.Sprintf(botAllowRegexTemplate, bn))
 }
