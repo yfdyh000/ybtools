@@ -26,7 +26,7 @@ import (
 // botName is used to match Template:Bots and the like.
 var botName string
 
-var botBanRegex regexp.Regexp
+var botBanRegex *regexp.Regexp
 
 const botBanRegexTemplate string = `{{nobots}}|{{bots\|deny=(?:[^,|}]*,)*%[1]s|{{bots\|allow=(?![^}|]*%[1]s[},|])`
 
