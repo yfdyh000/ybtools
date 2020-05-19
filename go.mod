@@ -1,4 +1,4 @@
-module github.com/mashedkeyboard/yapperbot-tools
+module github.com/mashedkeyboard/ybtools
 
 go 1.14
 
