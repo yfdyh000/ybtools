@@ -42,5 +42,5 @@ func BotAllowed(pageContent string) bool {
 // SetupBot sets the bot name, ready for future calls to BotAllowed.
 func SetupBot(bn string) {
 	botName = bn
-	botBanRegex = regexp.MustCompile(fmt.Sprintf(botRegexTemplate, bn))
+	botBanRegex = regexp.MustCompile(fmt.Sprintf(botBanRegexTemplate, bn))
 }
