@@ -32,7 +32,7 @@ var botAllowThisBotRegex *regexp.Regexp
 
 const botBanRegexTemplate string = `{{nobots}}|{{bots\|deny=(?:[^,|}]*,)*%[1]s`
 const botWhitelistRegexTemplate string = `{{bots\|allow=`
-const botAllowRegexTemplate string = `{{bots\|allow=(?![^}|]*%[1]s[},|])`
+const botAllowRegexTemplate string = `{{bots\|allow=(?:[^}|]*,)*%[1]s[},|]`
 
 func init() {
 	botWhitelistRegex = regexp.MustCompile(botWhitelistRegexTemplate)
