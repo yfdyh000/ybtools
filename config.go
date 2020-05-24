@@ -30,7 +30,6 @@ import (
 type configObject struct {
 	APIEndpoint string
 	BotUsername string
-	EditLimits  map[string]int64
 }
 
 // acts like an interface for config files
@@ -39,8 +38,9 @@ type toolConfigWithEditLimit struct {
 	EditLimit int64
 }
 
-const thisDirConfigPath string = "config.yml"
-const subDirConfigPath string = "../config-global.yml"
+const localConfigFilename string = "config.yml"
+const globalConfigFilename string = "config-global.yml"
+const botPasswordFilename string = "botpassword"
 
 var botPassword string
 var config configObject
@@ -48,12 +48,12 @@ var taskConfigFile []byte
 
 // ParseTaskConfig takes in a pointer to a config object
 // and populates the config object with the task configuration
-func ParseTaskConfig(cobj *interface{}) {
+func ParseTaskConfig(cobj interface{}) {
 	yaml.Unmarshal(taskConfigFile, cobj)
 }
 
 func init() {
-	botConfigFile, err := ioutil.ReadFile(findConfigFile())
+	botConfigFile, err := ioutil.ReadFile(findConfigFile(localConfigFilename, globalConfigFilename))
 	if err != nil {
 		log.Fatal("Bot config file could not be read at detected path!")
 	}
@@ -61,6 +61,12 @@ func init() {
 	if err != nil {
 		log.Fatal("Bot config file was invalid!")
 	}
+
+	botPasswordFile, err := ioutil.ReadFile(findConfigFile(botPasswordFilename, botPasswordFilename))
+	if err != nil {
+		log.Fatal("Bot password file could not be read at detected path!")
+	}
+	botPassword = string(botPasswordFile)
 }
 
 func setupTaskConfigFile() {
@@ -79,12 +85,16 @@ func setupTaskConfigFile() {
 	}
 }
 
-func findConfigFile() string {
-	if _, err := os.Stat(thisDirConfigPath); os.IsNotExist(err) {
-		if _, err := os.Stat(subDirConfigPath); os.IsNotExist(err) {
-			return subDirConfigPath
+// findConfigFile takes a local filename as a string, and a global filename as a string
+// It then finds the local filename in the current directory, or if there isn't one,
+// the global filename in the parent directory, and returns the name of the file it found.
+// If it doesn't find either, it fatally errors.
+func findConfigFile(filename string, globalfilename string) string {
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		if _, err := os.Stat("../" + globalfilename); os.IsNotExist(err) {
+			return "../" + globalfilename
 		}
-		log.Fatal("Couldn't find a config file either in this directory or in the one above it!")
+		log.Fatal("Couldn't find a config file for ", filename, " either in this directory or in the one above it!")
 	}
-	return thisDirConfigPath
+	return filename
 }

@@ -65,7 +65,7 @@ func setupEditLimit(limit int64) {
 
 	editLimitFileContents, err := ioutil.ReadFile("editlimit")
 	if err != nil {
-		// the runfile doesn't exist probably, try creating it
+		// the edit limit file doesn't exist probably, try creating it
 		err := ioutil.WriteFile("editlimit", []uint8{0x00, 0x00, 0x00}, 0644)
 		if err != nil {
 			log.Fatal("Failed to create edit limit file with error ", err)
