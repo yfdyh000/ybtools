@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/metal3d/go-slugify"
 	"gopkg.in/yaml.v2"
@@ -73,7 +74,7 @@ func setupTaskConfigFile() {
 	var err error
 	var taskConfigForEditLimit toolConfigWithEditLimit
 
-	taskConfigFile, err = ioutil.ReadFile("config-" + slugify.Marshal(taskName) + ".yml")
+	taskConfigFile, err = ioutil.ReadFile("config-" + strings.ToLower(slugify.Marshal(taskName)) + ".yml")
 	if err != nil {
 		log.Println("No task-specific config file found, ignoring")
 	}
