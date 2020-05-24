@@ -19,9 +19,31 @@ package ybtools
 //
 
 import (
+	"log"
+
 	"cgt.name/pkg/go-mwclient"
 	"cgt.name/pkg/go-mwclient/params"
 )
+
+// CreateAndAuthenticateClient uses the details already passed into ybtools
+// in setup.go to return a fully-authenticated mwclient
+func CreateAndAuthenticateClient() *mwclient.Client {
+	if taskName == "" || botUser == "" {
+		log.Fatal("Call ybtools.SetupBot first!")
+	}
+
+	w, err := mwclient.New(config.APIEndpoint, "Yapperbot-"+taskName+" on User:"+botUser+" - Golang, licensed GNU GPL")
+	if err != nil {
+		log.Fatal("Failed to create MediaWiki client with error ", err)
+	}
+
+	err = w.Login(config.BotUsername, botPassword)
+	if err != nil {
+		log.Fatal("Failed to authenticate with MediaWiki with error ", err)
+	}
+
+	return w
+}
 
 // FetchWikitext takes a client and a pageId and gets the wikitext of that page.
 // The default functionality in the library does not work for this in
