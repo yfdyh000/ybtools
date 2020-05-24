@@ -25,5 +25,6 @@ var botUser string
 func SetupBot(taskname string, botuser string) {
 	taskName = taskname
 	botUser = botuser
-	setupNobotsBot(botuser)
+	setupNobotsBot()
+	setupTaskConfigFile()
 }

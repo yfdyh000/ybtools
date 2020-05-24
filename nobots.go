@@ -23,9 +23,6 @@ import (
 	"regexp"
 )
 
-// botName is used to match Template:Bots and the like.
-var botName string
-
 var botBanRegex *regexp.Regexp
 var botWhitelistRegex *regexp.Regexp
 var botAllowThisBotRegex *regexp.Regexp
@@ -38,11 +35,11 @@ func init() {
 	botWhitelistRegex = regexp.MustCompile(botWhitelistRegexTemplate)
 }
 
-// BotAllowed take a page content and determines if the botName given is allowed
+// BotAllowed take a page content and determines if the botUser is allowed
 // to edit the page per the applicable templates.
 func BotAllowed(pageContent string) bool {
-	if botName == "" {
-		panic("BotAllowed called with no botName set!")
+	if botUser == "" {
+		panic("BotAllowed called with no botUser set!")
 	}
 
 	// this mess below is only necessary because Go doesn't support regex lookaheads
@@ -58,8 +55,7 @@ func BotAllowed(pageContent string) bool {
 }
 
 // setupNobotsBot sets the bot name, ready for future calls to BotAllowed.
-func setupNobotsBot(bn string) {
-	botName = bn
-	botBanRegex = regexp.MustCompile(fmt.Sprintf(botBanRegexTemplate, bn))
-	botAllowThisBotRegex = regexp.MustCompile(fmt.Sprintf(botAllowRegexTemplate, bn))
+func setupNobotsBot() {
+	botBanRegex = regexp.MustCompile(fmt.Sprintf(botBanRegexTemplate, botUser))
+	botAllowThisBotRegex = regexp.MustCompile(fmt.Sprintf(botAllowRegexTemplate, botUser))
 }
