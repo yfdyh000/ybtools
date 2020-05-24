@@ -39,7 +39,7 @@ func CreateAndAuthenticateClient() *mwclient.Client {
 
 	err = w.Login(config.BotUsername, botPassword)
 	if err != nil {
-		log.Fatal("Failed to authenticate with MediaWiki with error ", err)
+		log.Fatal("Failed to authenticate with MediaWiki with username ", config.BotUsername, " - error was ", err)
 	}
 
 	return w
