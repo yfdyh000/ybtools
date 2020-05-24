@@ -93,9 +93,9 @@ func setupTaskConfigFile() {
 func findConfigFile(filename string, globalfilename string) string {
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
 		if _, err := os.Stat("../" + globalfilename); os.IsNotExist(err) {
-			return "../" + globalfilename
+			log.Fatal("Couldn't find a config file for ", filename, " either in this directory or in the one above it!")
 		}
-		log.Fatal("Couldn't find a config file for ", filename, " either in this directory or in the one above it!")
+		return "../" + globalfilename
 	}
 	return filename
 }
