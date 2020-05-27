@@ -46,7 +46,14 @@ func GetContentFromPage(page *jason.Object) (content string, err error) {
 }
 
 // GetPagesFromQuery takes a query and returns an array of Pages.
+// Convenience wrapper for GetThingFromQuery.
 func GetPagesFromQuery(resp *jason.Object) []*jason.Object {
+	return GetThingFromQuery(resp, "pages")
+}
+
+// GetThingFromQuery takes a query and a key that's being looked for,
+// and returns the inner thing array.
+func GetThingFromQuery(resp *jason.Object, thing string) []*jason.Object {
 	query, err := resp.GetObject("query")
 	if err != nil {
 		switch err.(type) {
@@ -57,7 +64,7 @@ func GetPagesFromQuery(resp *jason.Object) []*jason.Object {
 			panic(err)
 		}
 	}
-	pages, err := query.GetObjectArray("pages")
+	pages, err := query.GetObjectArray(thing)
 	if err != nil {
 		panic(err)
 	}
