@@ -54,7 +54,7 @@ func FetchWikitext(w *mwclient.Client, pageID string) (content string, err error
 
 // FetchWikitextFromTitle takes a client and a title and gets the wikitext of that page.
 func FetchWikitextFromTitle(w *mwclient.Client, pageTitle string) (content string, err error) {
-	return fetchWikitextFrom(w, "title", pageTitle)
+	return fetchWikitextFrom(w, "page", pageTitle)
 }
 
 func fetchWikitextFrom(w *mwclient.Client, identifierName string, identifier string) (string, error) {
