@@ -49,10 +49,19 @@ func CreateAndAuthenticateClient() *mwclient.Client {
 // The default functionality in the library does not work for this in
 // my experience; it just returns an empty string for some reason. So we're rolling our own!
 func FetchWikitext(w *mwclient.Client, pageID string) (content string, err error) {
+	return fetchWikitextFrom(w, "pageid", pageID)
+}
+
+// FetchWikitextFromTitle takes a client and a title and gets the wikitext of that page.
+func FetchWikitextFromTitle(w *mwclient.Client, pageTitle string) (content string, err error) {
+	return fetchWikitextFrom(w, "title", pageTitle)
+}
+
+func fetchWikitextFrom(w *mwclient.Client, identifierName string, identifier string) (string, error) {
 	pageContent, err := w.Get(params.Values{
-		"action": "parse",
-		"pageid": pageID,
-		"prop":   "wikitext",
+		"action":       "parse",
+		identifierName: identifier,
+		"prop":         "wikitext",
 	})
 	if err != nil {
 		return "", err
