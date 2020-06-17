@@ -36,7 +36,7 @@ func PanicErr(v ...interface{}) {
 	m.SetHeader("Subject", botUser+" errored in "+taskName)
 	m.SetBody("text/plain", strerr)
 
-	d := gomail.Dialer{Host: "mail.tools.wmflabs.org", Port: 587}
+	d := gomail.Dialer{Host: "mail.tools.wmflabs.org", Port: 25}
 	if err := d.DialAndSend(m); err != nil {
 		strerr = "FAILED TO EMAIL ERROR (ERR " + err.Error() + "): " + strerr
 	}
