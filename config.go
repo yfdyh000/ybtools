@@ -56,16 +56,16 @@ func ParseTaskConfig(cobj interface{}) {
 func init() {
 	botConfigFile, err := ioutil.ReadFile(findConfigFile(localConfigFilename, globalConfigFilename))
 	if err != nil {
-		log.Fatal("Bot config file could not be read at detected path!")
+		PanicErr("Bot config file could not be read at detected path!")
 	}
 	err = yaml.UnmarshalStrict(botConfigFile, &config)
 	if err != nil {
-		log.Fatal("Bot config file was invalid!")
+		PanicErr("Bot config file was invalid!")
 	}
 
 	botPasswordFile, err := ioutil.ReadFile(findConfigFile(botPasswordFilename, botPasswordFilename))
 	if err != nil {
-		log.Fatal("Bot password file could not be read at detected path!")
+		PanicErr("Bot password file could not be read at detected path!")
 	}
 	botPassword = string(botPasswordFile)
 }
@@ -93,7 +93,7 @@ func setupTaskConfigFile() {
 func findConfigFile(filename string, globalfilename string) string {
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
 		if _, err := os.Stat("../" + globalfilename); os.IsNotExist(err) {
-			log.Fatal("Couldn't find a config file for ", filename, " either in this directory or in the one above it!")
+			PanicErr("Couldn't find a config file for ", filename, " either in this directory or in the one above it!")
 		}
 		return "../" + globalfilename
 	}

@@ -52,7 +52,7 @@ func SaveEditLimit() {
 		binary.PutVarint(buf, currentUsedEditLimit)
 		err := ioutil.WriteFile("editlimit", buf, 0644)
 		if err != nil {
-			log.Fatal("Failed to write edit limit file with err ", err)
+			PanicErr("Failed to write edit limit file with err ", err)
 		}
 	}
 }
@@ -68,13 +68,13 @@ func setupEditLimit(limit int64) {
 		// the edit limit file doesn't exist probably, try creating it
 		err := ioutil.WriteFile("editlimit", []uint8{0x00, 0x00, 0x00}, 0644)
 		if err != nil {
-			log.Fatal("Failed to create edit limit file with error ", err)
+			PanicErr("Failed to create edit limit file with error ", err)
 		}
 		editLimitFileContents = []uint8{0x00, 0x00, 0x00}
 	}
 	var bytesRead int
 	currentUsedEditLimit, bytesRead = binary.Varint(editLimitFileContents)
 	if bytesRead < 0 {
-		log.Fatal("editlimit file is corrupt, failed to convert with bytesRead ", bytesRead)
+		PanicErr("editlimit file is corrupt, failed to convert with bytesRead ", bytesRead)
 	}
 }

@@ -18,13 +18,27 @@ package ybtools
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-var taskName string
-var botUser string
+import (
+	"fmt"
 
-// SetupBot sets the bot name, ready for future calls to BotAllowed.
-func SetupBot(taskname string, botuser string) {
-	taskName = taskname
-	botUser = botuser
-	setupNobotsBot()
-	setupTaskConfigFile()
+	"gopkg.in/gomail.v2"
+)
+
+// PanicErr panics the program with a specified message,
+// also sending a message to the tool inbox on Toolforge explaining the issue.
+func PanicErr(v ...interface{}) {
+	strerr := fmt.Sprint(v...)
+	toolemail := "tools." + botUser + "@tools.wmflabs.org"
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", toolemail)
+	m.SetHeader("To", toolemail)
+	m.SetHeader("Subject", botUser+" errored in "+taskName)
+	m.SetBody("text/plain", strerr)
+
+	d := gomail.Dialer{Host: "mail.tools.wmflabs.org", Port: 587}
+	if err := d.DialAndSend(m); err != nil {
+		strerr = "FAILED TO EMAIL ERROR (ERR " + err.Error() + "): " + strerr
+	}
+	panic(strerr)
 }

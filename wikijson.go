@@ -2,9 +2,7 @@ package ybtools
 
 import (
 	"encoding/json"
-	"log"
 
-	"cgt.name/pkg/go-mwclient"
 	"github.com/antonholmquist/jason"
 )
 
@@ -30,27 +28,27 @@ import (
 func SerializeToJSON(serializable interface{}) string {
 	serialized, err := json.Marshal(serializable)
 	if err != nil {
-		log.Fatal("Failed to serialize object, dumping what I was trying to serialize: ", serializable)
+		PanicErr("Failed to serialize object, dumping what I was trying to serialize: ", serializable)
 	}
 	return string(serialized)
 }
 
-// LoadJSONFromPageID takes a mwclient and a pageID, then loads and deserializes the contained JSON.
+// LoadJSONFromPageID takes a pageID, then loads and deserializes the contained JSON.
 // It returns the deserialised JSON in a jason.Object pointer.
-func LoadJSONFromPageID(w *mwclient.Client, pageID string) *jason.Object {
-	storedJSON, err := FetchWikitext(w, pageID)
+func LoadJSONFromPageID(pageID string) *jason.Object {
+	storedJSON, err := FetchWikitext(pageID)
 	if err != nil {
-		log.Fatal("Failed to fetch JSON page with ID ", pageID, " with error ", err)
+		PanicErr("Failed to fetch JSON page with ID ", pageID, " with error ", err)
 	}
 	return parseJSON(storedJSON, "Failed to parse JSON on page ID "+pageID+" with error ")
 }
 
-// LoadJSONFromPageTitle takes a mwclient and a title string, then loads and deserializes the contained JSON.
+// LoadJSONFromPageTitle takes a title string, then loads and deserializes the contained JSON.
 // It returns the deserialised JSON in a jason.Object pointer.
-func LoadJSONFromPageTitle(w *mwclient.Client, pageTitle string) *jason.Object {
-	storedJSON, err := FetchWikitextFromTitle(w, pageTitle)
+func LoadJSONFromPageTitle(pageTitle string) *jason.Object {
+	storedJSON, err := FetchWikitextFromTitle(pageTitle)
 	if err != nil {
-		log.Fatal("Failed to fetch JSON page with title ", pageTitle, " with error ", err)
+		PanicErr("Failed to fetch JSON page with title ", pageTitle, " with error ", err)
 	}
 	return parseJSON(storedJSON, "Failed to parse JSON on page "+pageTitle+" with error ")
 }
@@ -58,7 +56,7 @@ func LoadJSONFromPageTitle(w *mwclient.Client, pageTitle string) *jason.Object {
 func parseJSON(contentToParse string, errorMsg string) *jason.Object {
 	parsedJSON, err := jason.NewObjectFromBytes([]byte(contentToParse))
 	if err != nil {
-		log.Fatal(errorMsg, err)
+		PanicErr(errorMsg, err)
 	}
 	return parsedJSON
 }

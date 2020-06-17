@@ -19,45 +19,47 @@ package ybtools
 //
 
 import (
-	"log"
-
 	"cgt.name/pkg/go-mwclient"
 	"cgt.name/pkg/go-mwclient/params"
 )
+
+var w *mwclient.Client
 
 // CreateAndAuthenticateClient uses the details already passed into ybtools
 // in setup.go to return a fully-authenticated mwclient
 func CreateAndAuthenticateClient() *mwclient.Client {
 	if taskName == "" || botUser == "" {
-		log.Fatal("Call ybtools.SetupBot first!")
+		PanicErr("Call ybtools.SetupBot first!")
 	}
 
-	w, err := mwclient.New(config.APIEndpoint, "Yapperbot-"+taskName+" on User:"+botUser+" - Golang, licensed GNU GPL")
+	var err error
+
+	w, err = mwclient.New(config.APIEndpoint, "Yapperbot-"+taskName+" on User:"+botUser+" - Golang, licensed GNU GPL")
 	if err != nil {
-		log.Fatal("Failed to create MediaWiki client with error ", err)
+		PanicErr("Failed to create MediaWiki client with error ", err)
 	}
 
 	err = w.Login(config.BotUsername, botPassword)
 	if err != nil {
-		log.Fatal("Failed to authenticate with MediaWiki with username ", config.BotUsername, " - error was ", err)
+		PanicErr("Failed to authenticate with MediaWiki with username ", config.BotUsername, " - error was ", err)
 	}
 
 	return w
 }
 
-// FetchWikitext takes a client and a pageId and gets the wikitext of that page.
+// FetchWikitext takes a pageId and gets the wikitext of that page.
 // The default functionality in the library does not work for this in
 // my experience; it just returns an empty string for some reason. So we're rolling our own!
-func FetchWikitext(w *mwclient.Client, pageID string) (content string, err error) {
-	return fetchWikitextFrom(w, "pageid", pageID)
+func FetchWikitext(pageID string) (content string, err error) {
+	return fetchWikitextFrom("pageid", pageID)
 }
 
-// FetchWikitextFromTitle takes a client and a title and gets the wikitext of that page.
-func FetchWikitextFromTitle(w *mwclient.Client, pageTitle string) (content string, err error) {
-	return fetchWikitextFrom(w, "page", pageTitle)
+// FetchWikitextFromTitle takes a title and gets the wikitext of that page.
+func FetchWikitextFromTitle(pageTitle string) (content string, err error) {
+	return fetchWikitextFrom("page", pageTitle)
 }
 
-func fetchWikitextFrom(w *mwclient.Client, identifierName string, identifier string) (string, error) {
+func fetchWikitextFrom(identifierName string, identifier string) (string, error) {
 	pageContent, err := w.Get(params.Values{
 		"action":       "parse",
 		identifierName: identifier,

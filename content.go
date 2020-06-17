@@ -79,13 +79,13 @@ func GetThingFromQuery(resp *jason.Object, thing string) []*jason.Object {
 func GetCategorisationTimestampFromPage(page *jason.Object, category string) (timestamp string) {
 	itemCategories, err := page.GetObjectArray("categories")
 	if err != nil {
-		log.Fatal("Failed to get categories with error message ", err)
+		PanicErr("Failed to get categories with error message ", err)
 	}
 	relevantCategory := itemCategories[0]
 
 	timestamp, err = relevantCategory.GetString("timestamp")
 	if err != nil {
-		log.Fatal("Failed to get categorisation timestamp with error message ", err)
+		PanicErr("Failed to get categorisation timestamp with error message ", err)
 	}
 	return
 }
