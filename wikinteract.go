@@ -44,6 +44,9 @@ func CreateAndAuthenticateClient() *mwclient.Client {
 		PanicErr("Failed to authenticate with MediaWiki with username ", config.BotUsername, " - error was ", err)
 	}
 
+	// runs here to make sure we have a client authenticated when we run it
+	killTaskIfNeeded()
+
 	return w
 }
 

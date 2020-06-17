@@ -28,7 +28,7 @@ func SetupBot(taskname string, botuser string) {
 	setupNobotsBot()
 	setupTaskConfigFile()
 	setKillPage()
-	killTaskIfNeeded()
+	// Kill pages are checked as soon as the mwclient is first authenticated
 }
 
 // CanEdit checks if the task has been killed, and then checks if the
