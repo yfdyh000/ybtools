@@ -28,13 +28,14 @@ func SetupBot(taskname string, botuser string) {
 	setupNobotsBot()
 	setupTaskConfigFile()
 	setKillPage()
+	killTaskIfNeeded()
 }
 
-// CanEdit checks if the bot is edit limited, if applicable, and then
-// checks if the task has been killed. This *must* be used for all edits
-// apart from those which only affect the bot's own userspace, or those
-// which must run even if the task is killed (e.g. updating JSON files
-// which describe the run which was just done).
+// CanEdit checks if the task has been killed, and then checks if the
+// bot is edit limited. This *must* be used for all edits apart from
+// those which only affect the bot's own userspace, or those which must
+// run even if the task is killed (e.g. updating JSON files which describe
+// the run which was just done).
 func CanEdit() bool {
 	killTaskIfNeeded()
 	return EditLimit()
