@@ -28,7 +28,7 @@ const killPagePrefix string = "/kill/"
 var killPage string
 
 func setKillPage() {
-	killPage = killPageNamespace + botUser + killPagePrefix + taskName
+	killPage = killPageNamespace + settings.BotUser + killPagePrefix + settings.TaskName
 }
 
 // killTaskIfNeeded checks the killPage for the bot task, and

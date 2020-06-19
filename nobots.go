@@ -38,7 +38,7 @@ func init() {
 // BotAllowed take a page content and determines if the botUser is allowed
 // to edit the page per the applicable templates.
 func BotAllowed(pageContent string) bool {
-	if botUser == "" {
+	if settings.BotUser == "" {
 		panic("BotAllowed called with no botUser set!")
 	}
 
@@ -56,6 +56,6 @@ func BotAllowed(pageContent string) bool {
 
 // setupNobotsBot sets the bot name, ready for future calls to BotAllowed.
 func setupNobotsBot() {
-	botBanRegex = regexp.MustCompile(fmt.Sprintf(botBanRegexTemplate, botUser))
-	botAllowThisBotRegex = regexp.MustCompile(fmt.Sprintf(botAllowRegexTemplate, botUser))
+	botBanRegex = regexp.MustCompile(fmt.Sprintf(botBanRegexTemplate, settings.BotUser))
+	botAllowThisBotRegex = regexp.MustCompile(fmt.Sprintf(botAllowRegexTemplate, settings.BotUser))
 }

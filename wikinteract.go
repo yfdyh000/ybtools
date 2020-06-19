@@ -25,19 +25,41 @@ import (
 
 var w *mwclient.Client
 
+// DefaultMaxlag is a Maxlag representing sensible defaults for any non-urgent
+// task being run by a Yapperbot.
+var DefaultMaxlag mwclient.Maxlag = mwclient.Maxlag{
+	On:      true,
+	Timeout: "5",
+	Retries: 3,
+}
+
+// NoMaxlag is a Maxlag for urgent tasks, where maxlag must be disabled.
+var NoMaxlag mwclient.Maxlag = mwclient.Maxlag{
+	On:      true,
+	Timeout: "5",
+	Retries: 3,
+}
+
 // CreateAndAuthenticateClient uses the details already passed into ybtools
 // in setup.go to return a fully-authenticated mwclient
-func CreateAndAuthenticateClient() *mwclient.Client {
-	if taskName == "" || botUser == "" {
+func CreateAndAuthenticateClient(maxlag mwclient.Maxlag) *mwclient.Client {
+	if settings.TaskName == "" || settings.BotUser == "" {
 		PanicErr("Call ybtools.SetupBot first!")
 	}
 
 	var err error
 
-	w, err = mwclient.New(config.APIEndpoint, "Yapperbot-"+taskName+" on User:"+botUser+" - Golang, licensed GNU GPL")
+	w, err = mwclient.New(config.APIEndpoint, "Yapperbot-"+settings.TaskName+" on User:"+settings.BotUser+" - Golang, licensed GNU GPL")
 	if err != nil {
 		PanicErr("Failed to create MediaWiki client with error ", err)
 	}
+
+	// This is necessary because maxlag.sleep is unexported,
+	// and is only configured correctly for production within
+	// mwclient.New. Annoying, but this is a bit of an edge case /shrug
+	w.Maxlag.On = maxlag.On
+	w.Maxlag.Retries = maxlag.Retries
+	w.Maxlag.Timeout = maxlag.Timeout
 
 	err = w.Login(config.BotUsername, botPassword)
 	if err != nil {

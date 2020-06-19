@@ -74,7 +74,7 @@ func setupTaskConfigFile() {
 	var err error
 	var taskConfigForEditLimit toolConfigWithEditLimit
 
-	taskConfigFile, err = ioutil.ReadFile("config-" + strings.ToLower(slugify.Marshal(taskName)) + ".yml")
+	taskConfigFile, err = ioutil.ReadFile("config-" + strings.ToLower(slugify.Marshal(settings.TaskName)) + ".yml")
 	if err != nil {
 		log.Println("No task-specific config file found, ignoring")
 	}

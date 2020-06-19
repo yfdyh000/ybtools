@@ -18,13 +18,18 @@ package ybtools
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-var taskName string
-var botUser string
+// BotSettings is a struct storing all the information about the bot
+// needed to make the tools library work.
+type BotSettings struct {
+	TaskName string
+	BotUser  string
+}
+
+var settings BotSettings
 
 // SetupBot sets the bot name, ready for future calls to BotAllowed.
-func SetupBot(taskname string, botuser string) {
-	taskName = taskname
-	botUser = botuser
+func SetupBot(s BotSettings) {
+	settings = s
 	setupNobotsBot()
 	setupTaskConfigFile()
 	setKillPage()

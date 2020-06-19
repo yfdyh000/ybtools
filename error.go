@@ -29,12 +29,12 @@ import (
 // also sending a message to the tool inbox on Toolforge explaining the issue.
 func PanicErr(v ...interface{}) {
 	strerr := fmt.Sprint(v...)
-	toolemail := "tools." + strings.ToLower(botUser) + "@tools.wmflabs.org"
+	toolemail := "tools." + strings.ToLower(settings.BotUser) + "@tools.wmflabs.org"
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", toolemail)
 	m.SetHeader("To", toolemail)
-	m.SetHeader("Subject", botUser+" errored in "+taskName)
+	m.SetHeader("Subject", settings.BotUser+" errored in "+settings.TaskName)
 	m.SetBody("text/plain", strerr)
 
 	d := gomail.Dialer{Host: "mail.tools.wmflabs.org", Port: 25}
