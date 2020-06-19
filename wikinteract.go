@@ -23,6 +23,10 @@ import (
 	"cgt.name/pkg/go-mwclient/params"
 )
 
+// NoMaxlagFunction is the definition of a function accepted by NoMaxlagDo;
+// it's just a function with no parameters that returns an error.
+type NoMaxlagFunction func() error
+
 var w *mwclient.Client
 
 // DefaultMaxlag is a Maxlag representing sensible defaults for any non-urgent
@@ -70,6 +74,16 @@ func CreateAndAuthenticateClient(maxlag mwclient.Maxlag) *mwclient.Client {
 	killTaskIfNeeded()
 
 	return w
+}
+
+// NoMaxlagDo takes a function which returns an error (or nil),
+// and an mwclient pointer, than executes that function with no maxlag.
+// It returns the same return as the NoMaxlagFunction it's passed.
+func NoMaxlagDo(f NoMaxlagFunction, w *mwclient.Client) error {
+	w.Maxlag.On = false
+	err := f()
+	w.Maxlag.On = true
+	return err
 }
 
 // FetchWikitext takes a pageId and gets the wikitext of that page.
