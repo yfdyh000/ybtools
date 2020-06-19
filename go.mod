@@ -1,4 +1,4 @@
-module github.com/mashedkeyboard/ybtools
+module github.com/mashedkeyboard/ybtools/v2
 
 go 1.14
 
