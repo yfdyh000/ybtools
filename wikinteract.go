@@ -90,26 +90,59 @@ func NoMaxlagDo(f NoMaxlagFunction, w *mwclient.Client) error {
 // The default functionality in the library does not work for this in
 // my experience; it just returns an empty string for some reason. So we're rolling our own!
 func FetchWikitext(pageID string) (content string, err error) {
-	return fetchWikitextFrom("pageid", pageID)
+	content, _, _, err = fetchWikitextFrom("pageids", pageID)
+	return
+}
+
+// FetchWikitextWithTimestamps takes a pageId and gets the wikitext of that page,
+// also returning the revision timestamp and the current timestamp.
+func FetchWikitextWithTimestamps(pageID string) (content string, revtimestamp string, curtimestamp string, err error) {
+	return fetchWikitextFrom("pageids", pageID)
 }
 
 // FetchWikitextFromTitle takes a title and gets the wikitext of that page.
 func FetchWikitextFromTitle(pageTitle string) (content string, err error) {
-	return fetchWikitextFrom("page", pageTitle)
+	content, _, _, err = fetchWikitextFrom("titles", pageTitle)
+	return
 }
 
-func fetchWikitextFrom(identifierName string, identifier string) (string, error) {
-	pageContent, err := w.Get(params.Values{
-		"action":       "parse",
+// FetchWikitextFromTitleWithTimestamps takes a title and gets the wikitext of that page,
+// also returning the revision timestamp and the current timestamp.
+func FetchWikitextFromTitleWithTimestamps(pageTitle string) (content string, revtimestamp string, curtimestamp string, err error) {
+	return fetchWikitextFrom("titles", pageTitle)
+}
+
+// fetchWikitextFrom takes an identifier name (i.e. pageids or titles), and one of those identifiers,
+// and then returns the wikitext, the revision timestamp, the current timestamp, and an error.
+func fetchWikitextFrom(identifierName string, identifier string) (string, string, string, error) {
+	queryResult, err := w.Get(params.Values{
+		"action":       "query",
 		identifierName: identifier,
-		"prop":         "wikitext",
+		"prop":         "revisions",
+		"curtimestamp": "1",
+		"rvprop":       "timestamp|content",
+		"rvslots":      "main",
 	})
 	if err != nil {
-		return "", err
+		return "", "", "", err
 	}
-	text, err := pageContent.GetString("parse", "wikitext")
+
+	curtimestamp, err := queryResult.GetString("curtimestamp")
 	if err != nil {
-		return "", err
+		return "", "", "", err
 	}
-	return text, nil
+
+	pages := GetPagesFromQuery(queryResult)
+	rev, err := pages[0].GetObjectArray("revisions")
+	if err != nil {
+		return "", "", "", err
+	}
+
+	revtimestamp, err := rev[0].GetString("timestamp")
+	if err != nil {
+		return "", "", "", err
+	}
+
+	text, err := GetMainSlotFromRevision(rev[0])
+	return text, revtimestamp, curtimestamp, err
 }

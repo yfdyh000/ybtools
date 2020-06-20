@@ -34,41 +34,51 @@ import (
 func GetContentFromPage(page *jason.Object) (content string, err error) {
 	rev, err := page.GetObjectArray("revisions")
 	if err != nil {
-		log.Println("Failed to get revisions from page, erroring getContentFromPage. Error was ", err)
-		return
+		log.Println("Failed to get revisions from page, erroring GetContentFromPage. Error was ", err)
+		return "", err
 	}
-	content, err = rev[0].GetString("slots", "main", "content")
-	if err != nil {
-		log.Println("Failed to get main slot content from page, erroring getContentFromPage. Error was", err)
-		return
-	}
-	return
+	return GetMainSlotFromRevision(rev[0])
 }
 
 // GetPagesFromQuery takes a query and returns an array of Pages.
 // Convenience wrapper for GetThingFromQuery.
 func GetPagesFromQuery(resp *jason.Object) []*jason.Object {
-	return GetThingFromQuery(resp, "pages")
+	pages, err := GetThingFromQuery(resp, "pages")
+	if err != nil {
+		panic(err)
+	}
+	return pages
 }
 
 // GetThingFromQuery takes a query and a key that's being looked for,
 // and returns the inner thing array.
-func GetThingFromQuery(resp *jason.Object, thing string) []*jason.Object {
+func GetThingFromQuery(resp *jason.Object, thing string) ([]*jason.Object, error) {
 	query, err := resp.GetObject("query")
 	if err != nil {
 		switch err.(type) {
 		case jason.KeyNotFoundError:
 			// no query means no results
-			return []*jason.Object{}
+			return []*jason.Object{}, nil
 		default:
-			panic(err)
+			return nil, err
 		}
 	}
 	pages, err := query.GetObjectArray(thing)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return pages
+	return pages, nil
+}
+
+// GetMainSlotFromRevision fetches the main slot content, given a revision object
+// formatted per the MediaWiki Action API JSON.
+func GetMainSlotFromRevision(revision *jason.Object) (string, error) {
+	content, err := revision.GetString("slots", "main", "content")
+	if err != nil {
+		log.Println("Failed to get main slot content from page, erroring GetMainSlotFromRevision. Error was", err)
+		return "", err
+	}
+	return content, nil
 }
 
 // GetCategorisationTimestampFromPage takes a page,
