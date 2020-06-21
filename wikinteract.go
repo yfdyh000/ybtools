@@ -30,7 +30,7 @@ import (
 type NoMaxlagFunction func() error
 
 // PageInQueryCallback is a function used as a callback for ForPageInQuery.
-type PageInQueryCallback func(pageTitle, pageContent, curTS, revTS string)
+type PageInQueryCallback func(pageTitle, pageContent, revTS, curTS string)
 
 var w *mwclient.Client
 
@@ -155,7 +155,7 @@ func ForPageInQuery(parameters params.Values, callback PageInQueryCallback) {
 					continue
 				}
 
-				callback(pageTitle, pageContent, curTS, lastTimestamp)
+				callback(pageTitle, pageContent, lastTimestamp, curTS)
 			}
 		}
 	}
