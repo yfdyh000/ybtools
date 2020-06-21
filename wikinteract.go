@@ -182,6 +182,10 @@ func fetchWikitextFrom(identifierName string, identifier string) (string, string
 	}
 
 	pages := GetPagesFromQuery(queryResult)
+	if len(pages) < 1 {
+		return "", "", "", mwclient.ErrPageNotFound
+	}
+
 	rev, err := pages[0].GetObjectArray("revisions")
 	if err != nil {
 		return "", "", "", err
