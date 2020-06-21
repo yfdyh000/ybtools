@@ -19,6 +19,8 @@ package ybtools
 //
 
 import (
+	"log"
+
 	"cgt.name/pkg/go-mwclient"
 	"cgt.name/pkg/go-mwclient/params"
 )
@@ -26,6 +28,9 @@ import (
 // NoMaxlagFunction is the definition of a function accepted by NoMaxlagDo;
 // it's just a function with no parameters that returns an error.
 type NoMaxlagFunction func() error
+
+// PageInQueryCallback is a function used as a callback for ForPageInQuery.
+type PageInQueryCallback func(pageTitle, pageContent, curTS, revTS string)
 
 var w *mwclient.Client
 
@@ -110,6 +115,50 @@ func FetchWikitextFromTitle(pageTitle string) (content string, err error) {
 // also returning the revision timestamp and the current timestamp.
 func FetchWikitextFromTitleWithTimestamps(pageTitle string) (content string, revtimestamp string, curtimestamp string, err error) {
 	return fetchWikitextFrom("titles", pageTitle)
+}
+
+// ForPageInQuery takes parameters and a callback function. It then queries using the parameters it is given,
+// and calls the callback function for every page in the query response.
+func ForPageInQuery(parameters params.Values, callback PageInQueryCallback) {
+	query := w.NewQuery(parameters)
+	for query.Next() {
+		pages := GetPagesFromQuery(query.Resp())
+
+		curTS, err := query.Resp().GetString("curtimestamp")
+		if err != nil {
+			PanicErr("Failed to get current timestamp! Error was", err)
+		}
+
+		if len(pages) > 0 {
+			for _, page := range pages {
+				pageTitle, err := page.GetString("title")
+				if err != nil {
+					log.Println("Failed to get title from page, so skipping it. Error was", err)
+					continue
+				}
+
+				pageRevisions, err := page.GetObjectArray("revisions")
+				if err != nil {
+					log.Println("Failed to get revisions array from page, so skipping it. Error was", err)
+					continue
+				}
+
+				pageContent, err := GetMainSlotFromRevision(pageRevisions[0])
+				if err != nil {
+					log.Println("Failed to get content from page", pageTitle, ", so skipping it. Error was", err)
+					continue
+				}
+
+				lastTimestamp, err := pageRevisions[0].GetString("timestamp")
+				if err != nil {
+					log.Println("Failed to get timestamp from revision, so skipping the page. Error was", err)
+					continue
+				}
+
+				callback(pageTitle, pageContent, curTS, lastTimestamp)
+			}
+		}
+	}
 }
 
 // fetchWikitextFrom takes an identifier name (i.e. pageids or titles), and one of those identifiers,
