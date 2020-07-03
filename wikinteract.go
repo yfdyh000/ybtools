@@ -139,19 +139,19 @@ func ForPageInQuery(parameters params.Values, callback PageInQueryCallback) {
 
 				pageRevisions, err := page.GetObjectArray("revisions")
 				if err != nil {
-					log.Println("Failed to get revisions array from page, so skipping it. Error was", err)
+					log.Printf("Failed to get revisions array from page `%s`, so skipping it. Error was %s \n", pageTitle, err)
 					continue
 				}
 
 				pageContent, err := GetMainSlotFromRevision(pageRevisions[0])
 				if err != nil {
-					log.Println("Failed to get content from page", pageTitle, ", so skipping it. Error was", err)
+					log.Printf("Failed to get content from page `%s`, so skipping it. Error was %s \n", pageTitle, err)
 					continue
 				}
 
 				lastTimestamp, err := pageRevisions[0].GetString("timestamp")
 				if err != nil {
-					log.Println("Failed to get timestamp from revision, so skipping the page. Error was", err)
+					log.Printf("Failed to get timestamp from revision on page `%s`, so skipping it. Error was %s \n", pageTitle, err)
 					continue
 				}
 
